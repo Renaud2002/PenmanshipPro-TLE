@@ -7,6 +7,8 @@ import {
   MenuItem,
   Box,
   Typography,
+  createTheme,
+  ThemeProvider,
 } from '@mui/material';
 import React, {useState, useEffect, useRef} from 'react';
 import {socket} from '../App';
@@ -22,7 +24,39 @@ const MenuProps = {
     },
   },
 };
+
 let previous = null;
+const theme = createTheme({
+  palette: {
+    background: {
+      paper: '#fff',
+    },
+    text: {
+      primary: 'rgba(38,38,38,1)',
+      secondary: 'rgba(38,38,38,.75)',
+    },
+    fill: {
+      active: 'rgba(0,10,32,.05)',
+      hover: 'rgba(0,10,32,.1)'
+    },
+  },
+  typography: {
+    fontFamily: [
+      'poppins',
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  }
+});
+
 
 export default function Write() {
   const [selected, setSelected] = useState('A');
@@ -110,95 +144,137 @@ export default function Write() {
   }, []);
 
   return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      spacing={2}
-      sx={{
-        mt: 5,
-      }}
-    >
-      <FormControl>
-        <InputLabel>Letter</InputLabel>
-        <Select
-          value={selected}
-          label="Letter"
-          onChange={handleChange}
-          MenuProps={MenuProps}
-        >
-          {Object.keys(letters).map((letter) => (
-            <MenuItem key={letter} value={letters[letter]}>
-              {letters[letter]}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Button
-        onClick={() => {
-          ctx.current.fillStyle = 'white';
-          ctx.current.fillRect(
-            0,
-            0,
-            canvas.current.width,
-            canvas.current.height,
-          );
-        }}
-      >
-        Clear
-      </Button>
+    <ThemeProvider theme={theme}>
+      <Stack
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+            sx={{
+              mt: 5,
+              color: 'text.primary'
+            }}
+          >
+            <FormControl>
+              <InputLabel>
+                Letter
+              </InputLabel>
+              <Select
+                sx={{borderRadius: 2,
+                  color: "text.primary",
+                  backgroundColor: "fill.active",
+                '&:clicked': {
 
-      <Box
-        sx={{
-          border: '1px solid black',
-        }}
-      >
-        <canvas id="canvas" />
-      </Box>
+                },
+                '&:focus': {
+                  backgroundColor: "fill.hover",
+                  color: "text.primary",
+                },
+                '&:hover': {
+                  backgroundColor: "fill.hover",
+                  color: "text.primary"
+                },}}
+                value={selected}
+                label="Letter"
+                onChange={handleChange}
+                MenuProps={MenuProps}
+              >
+                {Object.keys(letters).map((letter) => (
+                  <MenuItem key={letter} value={letters[letter]}>
+                    {letters[letter]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              sx={{borderRadius: 2,
+                  color: "rgb(255, 255, 255)",
+                  backgroundColor: "rgba(38, 38, 38, 1)",
+                  boxShadow: "0px 1px 3px rgba(0,0,0,.04),0px 4px 12px rgba(0,0,0,.08)",
+                '&:hover': {
+                  color: "rgb(255, 255, 255)",
+                  backgroundColor: "rgba(38, 38, 38, 1)",
+                  boxShadow: "0px 1px 3px rgba(0,0,0,.04),0px 4px 12px rgba(0,0,0,.08)",
+                },}}
+              onClick={() => {
+                ctx.current.fillStyle = 'white';
+                ctx.current.fillRect(
+                  0,
+                  0,
+                  canvas.current.width,
+                  canvas.current.height,
+                );
+              }}
+            >
+              Clear
+            </Button>
 
-      <Button
-        onClick={() => {
-          const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
-            colorSpace: 'srgb',
-          });
+            <Box
+              sx={{
+                border: '1px solid',
+                borderColor: 'text.primary',
+                boxShadow: 1,
+              }}
+            >
+              <canvas id="canvas" />
+            </Box>
 
-          const nums = ctx_data.data;
-          let array = [];
-          let pixels = [];
-          for (let i = 0; i < nums.length; i += 4) {
-            let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3.0;
-            pixels.push([avg, avg, avg]);
-            if (pixels.length === 224) {
-              array.push(pixels);
-              pixels = [];
-            }
-          }
-          if (previous === null) {
-            previous = array.toString();
-          } else {
-            console.log(previous === array.toString());
-            previous = array.toString();
-          }
-          socket.emit('predict', JSON.stringify(array));
-        }}
-      >
-        Submit
-      </Button>
-      {result && (
-        <Stack direction="column" alignItems="center" justifyContent="center">
-          <Typography>
-            {selected === result.result
-              ? 'You have written the correct letter: ' + result.result
-              : 'You have written the wrong letter, you have written a: ' +
-                result.result}
-          </Typography>
-          <Typography>
-            {selected === result.result
-              ? 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'
-              : 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'}
-          </Typography>
-        </Stack>
-      )}
-    </Stack>
+            <Button
+              sx={{borderRadius: 2,
+                color: "#fff",
+                backgroundColor: "rgb(45, 181, 93)",
+              '&:hover': {
+                backgroundColor: "rgba(38,154,79, 1)",
+                color: "#fff",
+              },}}
+              onClick={() => {
+                const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
+                  colorSpace: 'srgb',
+                });
+
+                const nums = ctx_data.data;
+                let array = [];
+                let pixels = [];
+                for (let i = 0; i < nums.length; i += 4) {
+                  let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3.0;
+                  pixels.push([avg, avg, avg]);
+                  if (pixels.length === 224) {
+                    array.push(pixels);
+                    pixels = [];
+                  }
+                }
+                if (previous === null) {
+                  previous = array.toString();
+                } else {
+                  console.log(previous === array.toString());
+                  previous = array.toString();
+                }
+                socket.emit('predict', JSON.stringify(array));
+              }}
+            >
+              Submit
+            </Button>
+            {result && (
+              <Stack direction="column" alignItems="center" justifyContent="center">
+                <Typography sx={{
+                  fontSize: 18,
+                }}>
+                  {selected === result.result
+                    ? 'You have written the correct letter: ' + result.result
+                    : 'You have written the wrong letter, you have written a: ' +
+                      result.result}
+                </Typography>
+                <Typography sx={{
+                  fontSize: 18,
+                }}>
+                  {selected === result.result
+                    ? 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'
+                    : 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'}
+                </Typography>
+              </Stack>
+            )}
+      </Stack>
+    </ThemeProvider>
+    
   );
 }
