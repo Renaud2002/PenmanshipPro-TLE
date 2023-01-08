@@ -8,6 +8,7 @@ import {
   Box,
 } from '@mui/material';
 import React, {useState, useEffect, useRef} from 'react';
+import {socket} from '../App';
 import {letters} from './constant';
 
 const ITEM_HEIGHT = 48;
@@ -30,14 +31,15 @@ export default function Write() {
 
   let prevX = useRef(null);
   let prevY = useRef(null);
+  let canvas = useRef(null);
 
   let draw = useRef(false);
   let ctx = useRef(null);
   useEffect(() => {
-    let canvas = document.getElementById('canvas');
-    canvas.height = 224;
-    canvas.width = 224;
-    ctx.current = canvas.getContext('2d');
+    canvas.current = document.getElementById('canvas');
+    canvas.current.height = 224;
+    canvas.current.width = 224;
+    ctx.current = canvas.current.getContext('2d');
     ctx.current.lineWidth = 5;
 
     window.addEventListener('mousedown', (e) => (draw.current = true));
@@ -45,19 +47,19 @@ export default function Write() {
 
     window.addEventListener('mousemove', function (e) {
       if (prevX.current == null || prevY.current == null || !draw.current) {
-        prevX.current = e.clientX - canvas.getBoundingClientRect().left;
-        prevY.current = e.clientY - canvas.getBoundingClientRect().top;
+        prevX.current = e.clientX - canvas.current.getBoundingClientRect().left;
+        prevY.current = e.clientY - canvas.current.getBoundingClientRect().top;
         return;
       }
-      let mouseX = e.clientX - canvas.getBoundingClientRect().left;
-      let mouseY = e.clientY - canvas.getBoundingClientRect().top;
+      let mouseX = e.clientX - canvas.current.getBoundingClientRect().left;
+      let mouseY = e.clientY - canvas.current.getBoundingClientRect().top;
       ctx.current.beginPath();
       ctx.current.moveTo(prevX.current, prevY.current);
       ctx.current.lineTo(mouseX, mouseY);
       ctx.current.stroke();
 
-      prevX.current = e.clientX - canvas.getBoundingClientRect().left;
-      prevY.current = e.clientY - canvas.getBoundingClientRect().top;
+      prevX.current = e.clientX - canvas.current.getBoundingClientRect().left;
+      prevY.current = e.clientY - canvas.current.getBoundingClientRect().top;
     });
     return () => {
       window.removeEventListener('mousedown', (e) => (draw.current = true));
@@ -65,28 +67,71 @@ export default function Write() {
 
       window.removeEventListener('mousemove', function (e) {
         if (prevX.current == null || prevY.current == null || !draw.current) {
-          prevX.current = e.clientX - canvas.getBoundingClientRect().left;
-          prevY.current = e.clientY - canvas.getBoundingClientRect().top;
+          prevX.current =
+            e.clientX - canvas.current.getBoundingClientRect().left;
+          prevY.current =
+            e.clientY - canvas.current.getBoundingClientRect().top;
           return;
         }
 
-        let mouseX = e.clientX - canvas.getBoundingClientRect().left;
-        let mouseY = e.clientY - canvas.getBoundingClientRect().top;
+        let mouseX = e.clientX - canvas.current.getBoundingClientRect().left;
+        let mouseY = e.clientY - canvas.current.getBoundingClientRect().top;
         ctx.current.beginPath();
         ctx.current.moveTo(prevX.current, prevY.current);
         ctx.current.lineTo(mouseX, mouseY);
         ctx.current.stroke();
 
-        prevX.current = e.clientX - canvas.getBoundingClientRect().left;
-        prevY.current = e.clientY - canvas.getBoundingClientRect().top;
+        prevX.current = e.clientX - canvas.current.getBoundingClientRect().left;
+        prevY.current = e.clientY - canvas.current.getBoundingClientRect().top;
       });
     };
   }, []);
 
   return (
-    <Stack direction="column" alignItems="center" justifyContent="center">
+    <Stack
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      spacing={2}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="center">
+        <Button
+          onClick={() => {
+            const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
+              colorSpace: 'srgb',
+            });
+            const nums = ctx_data.data;
+            let array = [];
+            let pixels = [];
+            for (let i = 0; i < nums.length; i += 4) {
+              let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3;
+              pixels.push([avg, avg, avg]);
+              if (pixels.length === 224) {
+                array.push(pixels);
+                pixels = [];
+              }
+            }
+            socket.emit('predict', array);
+          }}
+        >
+          Save
+        </Button>
+        <Button
+          onClick={() => {
+            ctx.current.clearRect(
+              0,
+              0,
+              canvas.current.width,
+              canvas.current.height,
+            );
+          }}
+        >
+          Clear
+        </Button>
+      </Stack>
       <FormControl fullWidth>
         <InputLabel>Letter</InputLabel>
+
         <Select
           value={selected}
           label="Letter"
