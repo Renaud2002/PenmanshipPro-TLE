@@ -1,31 +1,17 @@
 import {
   Button,
-  FormControl,
-  InputLabel,
   Stack,
-  Select,
-  MenuItem,
   Box,
   Typography,
   createTheme,
   ThemeProvider,
+  Grid,
 } from '@mui/material';
 import React, {useState, useEffect, useRef} from 'react';
 import {socket} from '../App';
 import {letters} from './constant';
+import {useTimer} from 'react-timer-hook';
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 50,
-    },
-  },
-};
-
-let previous = null;
 const theme = createTheme({
   palette: {
     background: {
@@ -57,22 +43,39 @@ const theme = createTheme({
   },
 });
 
-export default function Write() {
-  const [selected, setSelected] = useState('A');
+export default function Test() {
   const [result, setResult] = useState(null);
+  const [stored, setStored] = useState([]);
+  const [selected, setSelected] = useState('None');
+  const [game, setGame] = useState(false);
+  const time = new Date();
+  time.setSeconds(time.getSeconds() + 6);
+  const socketRef = useRef(socket);
+  const {seconds, start, restart} = useTimer({
+    expiryTimestamp: time,
+    autoStart: false,
+    onExpire: () => {
+      setGame(false);
+      ctx.current.fillStyle = 'white';
+      ctx.current.fillRect(0, 0, canvas.current.width, canvas.current.height);
+      handleSubmit();
+      const time = new Date();
+      time.setSeconds(time.getSeconds() + 6);
+      restart(time, false);
+    },
+  });
 
-  const handleChange = (event) => {
-    setSelected(event.target.value);
-  };
+  function handleSubmit() {
+    console.log(socket);
+    console.log(JSON.stringify(stored));
+    socketRef.current.emit('multiple', JSON.stringify(stored));
+  }
 
   // Socketio
   useEffect(() => {
-    socket.on('prediction', (data) => {
-      let temp = letters[data[0]];
-      setResult({
-        result: temp,
-        accuracy: data[1],
-      });
+    socket.on('multiple', (data) => {
+      console.log(data);
+      setResult(data);
     });
   }, []);
 
@@ -86,7 +89,7 @@ export default function Write() {
     canvas.current = document.getElementById('canvas');
     canvas.current.height = 224;
     canvas.current.width = 224;
-    ctx.current = canvas.current.getContext('2d');
+    ctx.current = canvas.current.getContext('2d', {willReadFrequently: true});
     ctx.current.lineWidth = 20;
     // Line should be white
     ctx.current.strokeStyle = 'black';
@@ -144,46 +147,50 @@ export default function Write() {
 
   return (
     <ThemeProvider theme={theme}>
+      {!game && (
+        <Stack height="50x" direction="column" spacing={2} alignItems="center">
+          <Typography>Click the button below to start!</Typography>
+          <Typography>
+            You will have 6 seconds to write as many letter as you can.
+          </Typography>
+          <Button
+            onClick={() => {
+              ctx.current.fillStyle = 'white';
+              ctx.current.fillRect(
+                0,
+                0,
+                canvas.current.width,
+                canvas.current.height,
+              );
+              setStored([]);
+              // Set a random letter
+              setSelected(
+                letters[
+                  Math.floor(Math.random() * Object.keys(letters).length)
+                ],
+              );
+              setGame(true);
+              start();
+            }}
+          >
+            Start
+          </Button>
+        </Stack>
+      )}
+      {game && <Box height="50px"></Box>}
       <Stack
         direction="column"
         alignItems="center"
         justifyContent="center"
         spacing={2}
         sx={{
-          mt: 5,
           color: 'text.primary',
         }}
       >
-        <FormControl>
-          <InputLabel>Letter</InputLabel>
-          <Select
-            sx={{
-              borderRadius: 2,
-              color: 'text.primary',
-              backgroundColor: 'fill.active',
-              '&:clicked': {},
-              '&:focus': {
-                backgroundColor: 'fill.hover',
-                color: 'text.primary',
-              },
-              '&:hover': {
-                backgroundColor: 'fill.hover',
-                color: 'text.primary',
-              },
-            }}
-            value={selected}
-            label="Letter"
-            onChange={handleChange}
-            MenuProps={MenuProps}
-          >
-            {Object.keys(letters).map((letter) => (
-              <MenuItem key={letter} value={letters[letter]}>
-                {letters[letter]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Typography variant="h4">Time left: {seconds}</Typography>
+        <Typography variant="h4">Letter: {selected}</Typography>
         <Button
+          disabled={!game}
           sx={{
             borderRadius: 2,
             color: 'rgb(255, 255, 255)',
@@ -221,6 +228,7 @@ export default function Write() {
         </Box>
 
         <Button
+          disabled={!game}
           sx={{
             borderRadius: 2,
             color: '#fff',
@@ -246,43 +254,45 @@ export default function Write() {
                 pixels = [];
               }
             }
-            if (previous === null) {
-              previous = array.toString();
-            } else {
-              console.log(previous === array.toString());
-              previous = array.toString();
-            }
-            socket.emit('predict', JSON.stringify(array));
+            ctx.current.fillStyle = 'white';
+            ctx.current.fillRect(
+              0,
+              0,
+              canvas.current.width,
+              canvas.current.height,
+            );
+            setStored([...stored, [selected, array]]);
+            setSelected(
+              letters[Math.floor(Math.random() * Object.keys(letters).length)],
+            );
           }}
         >
           Submit
         </Button>
         {result && (
-          <Stack direction="column" alignItems="center" justifyContent="center">
-            <Typography
-              sx={{
-                fontSize: 18,
-              }}
-            >
-              {selected === result.result
-                ? 'You have written the correct letter: ' + result.result
-                : 'You have written the wrong letter, you have written a: ' +
-                  result.result}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 18,
-              }}
-            >
-              {selected === result.result
-                ? 'Your accuracy is: ' +
-                  (result.accuracy * 100).toFixed(2) +
-                  '%'
-                : 'Your accuracy is: ' +
-                  (result.accuracy * 100).toFixed(2) +
-                  '%'}
-            </Typography>
-          </Stack>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h4">Results</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="h6">Expected</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="h6">Predicted</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="h6">Accuracy</Typography>
+            </Grid>
+            {stored.map((item, index) =>
+              item.map((each, i) => (
+                <Grid item xs={4}>
+                  <Typography key={index + i} variant="h6">
+                    {each}
+                  </Typography>
+                </Grid>
+              )),
+            )}
+          </Grid>
         )}
       </Stack>
     </ThemeProvider>

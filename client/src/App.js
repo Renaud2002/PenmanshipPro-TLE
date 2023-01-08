@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
-import {Box} from '@mui/material';
+import {Box, Button, Stack} from '@mui/material';
 import Write from './Component/Write';
 import {io} from 'socket.io-client';
+import Test from './Component/Test';
 
-export const socket = io('https://penmanshipbackend.hop.sh/');
+export const socket = io('http://127.0.0.1:5000');
 
 function App() {
+  const [mode, setMode] = useState(0);
   return (
     <Box
       width="100%"
@@ -15,8 +17,27 @@ function App() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      sx={{
+        mt: 5,
+      }}
     >
-      <Write />
+      <Stack direction="row" spacing={2}>
+        <Button
+          onClick={() => {
+            setMode(0);
+          }}
+        >
+          Practice
+        </Button>
+        <Button
+          onClick={() => {
+            setMode(1);
+          }}
+        >
+          Test
+        </Button>
+      </Stack>
+      {mode === 0 ? <Write /> : <Test />}
     </Box>
   );
 }

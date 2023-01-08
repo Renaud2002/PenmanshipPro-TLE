@@ -19,21 +19,6 @@ def index():
     return "Index Html"
 
 
-@app.errorhandler(404)
-def url_error(e):
-    return """
-    Wrong URL!
-    <pre>{}</pre>""".format(e), 404
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return """
-    An internal error occurred: <pre>{}</pre>
-    See logs for full stacktrace.
-    """.format(e), 500
-
-
 @socketio.on('json')
 def handle_json(json):
     print('received json: ' + str(json))
@@ -42,6 +27,8 @@ def handle_json(json):
 @socketio.on('predict')
 def handle_predict(json):
     data = js.loads(json)
+    print(data)
+    
     #Flip the image so 255 is white and 0 is black
     data = 255 - np.asarray(data, dtype=np.uint8)
     # Downscale to 28x28
@@ -53,6 +40,30 @@ def handle_predict(json):
     # Convert from 28,28,3 to 28,28,1
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
     socketio.emit('prediction', writing.infer(data))
+
+@socketio.on('multiple')
+def handle_multiple(json):
+    print('received json: ' + str(json))
+    data = js.loads(json)
+    print(data)
+    returnArray = []
+    for item in data:
+        print(item)
+        tempArray = []
+        tempArray.append(item[0])
+        #Flip the image so 255 is white and 0 is black
+        temp = 255 - np.asarray(item[1], dtype=np.uint8)
+        # Downscale to 28x28
+        temp = cv2.resize(temp, dsize=(28, 28), interpolation=cv2.INTER_CUBIC)
+    
+        # Convert from 28,28,3 to 28,28,1
+        temp = cv2.cvtColor(temp, cv2.COLOR_BGR2GRAY)
+        result = writing.infer(temp)
+        tempArray.append(result[0])
+        tempArray.append(result[1])
+        returnArray.append(tempArray)
+    print(returnArray)
+    socketio.emit('multiple', returnArray)
 
 
 if __name__ == '__main__':
