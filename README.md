@@ -1,4 +1,4 @@
-# Pennmanship - TLE
+# Pennmanship Pro - TLE
 
 Live Demo: https://penmanship.hop.sh/
 
