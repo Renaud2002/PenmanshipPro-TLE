@@ -18,25 +18,35 @@ A way to improve handwriting! This webapp is designed to help you improve your h
 Our program is designed to help people improve their handwriting skills and increase legibility. With Penmanship Pro, you'll be able to write confidently, clearly, and concisely. 
 
 ## Inspiration: 
-In today’s digital world, most people are suffering from handwriting skills; a Survey finds Nearly half of Americans struggle to read their handwriting. So we decided to help people better their handwriting skills, and with Penmanship pro, we do just that. It will allow you to sharpen up your handwriting skill. 
+In today's modern age, it's not uncommon for people to struggle with their handwriting skills. According to a recent survey, almost half of Americans have difficulty reading their own handwriting. That's why we developed Penmanship Pro - a tool designed to help improve handwriting skills. With its guidance and practice exercises, Penmanship Pro will allow you to refine your handwriting and boost your skills to a whole new level.
 
 ## What it does
-Our website is a helpful resource for anyone looking to improve their handwriting, whether for personal or professional reasons. These resources may include worksheets, exercises, and lessons on proper handwriting techniques, as well as tips and tricks for creating legible and attractive handwriting. We use a well-trained machine-learning model to give users the best feedback on their practice.
+Our website is a comprehensive resource for individuals seeking to improve their handwriting. Our resources include a variety of worksheets, exercises, and lessons on proper handwriting techniques that will help you develop legible and aesthetically pleasing handwriting. Additionally, we offer tips and tricks that will aid you in your handwriting journey. To ensure that our users receive the most accurate and helpful feedback, we have implemented a well-trained machine-learning model that evaluates practice exercises. Whether you want to improve your handwriting for personal or professional reasons, our website has everything you need to succeed.
 
 ## How we built it
-We built penmanship pro using React for the front end and python flask socketio for the backend. To provide the feedback to users, a train machine learning model was added to the backend, so when the handwriting test is passed to the backend as a 2d array, the data goes through the model to get a score
+Penmanship Pro was developed using React for the front-end interface and Python Flask for the back-end. Socket.io was implemented to facilitate communication between the front-end and back-end. In order to provide users with detailed and accurate feedback on their handwriting, we have utilized a custom-trained machine learning model. This model evaluates users' writing and assigns a score based on various factors such as legibility, consistency, and overall appearance. In this way, Penmanship Pro is able to offer personalized guidance and support to help users improve their handwriting skills.
 
 
 ## Challenges we ran into
-Given the fact that we are still beginners. We’ve encountered various challenges, such as implementing the flask and the backend part. It was also difficult for us to deploy the Machine learning model for the first time and send images over socketio
+One of the main challenges we faced was implementing the Flask back-end and integrating it with the front-end interface built with React. Additionally, deploying the machine learning model for the first time and implementing Socket.io to send images presented a significant challenge. Despite these difficulties, we have persevered and are proud to have overcome these obstacles and successfully launched Penmanship Pro.
 
 ## Accomplishments that we're proud of
 
-Our team was able to create a fully functional web app within 24hr hours.  
+Our team created a fully functional web app within 24hr hours.
+Able to successfully deploy both the frontend and backend
+Trained a custom machine learning model
+Figuring out how to send image data between the frontend and backend
+Implemented a user-friendly and intuitive interface for the web application
 
 ## What we learned
-We learned about various technologies/ frameworks and  cloud services such as flask, replit, Microsoft cloud. 
+How to build a web application using React and Python Flask
+How to implement a machine learning model and use it to provide personalized feedback to users
+How to use Socket.io to facilitate communication between the front-end and back-end of the web app
+Techniques for building a responsive design that allows the web app to be easily used on a variety of devices.
 
 ## What's next for Pennmanship Pro
-Creating a mobile app would be our next move.
+Expanding the resources available on the website, including adding more worksheets, exercises, and lessons
+Developing additional features for the web app, such as a progress tracker to help users monitor their progress and set goals
+Adding more languages to the web app, allowing it to be used by a wider international audience
+Very reach goals: Collaborating with educators and schools to integrate Penmanship Pro into classrooms and curricula
 
