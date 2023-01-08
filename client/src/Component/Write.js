@@ -5,6 +5,7 @@ import {
   Stack,
   Select,
   MenuItem,
+  Box,
 } from '@mui/material';
 import React, {useState, useEffect, useRef} from 'react';
 import {letters} from './constant';
@@ -44,21 +45,19 @@ export default function Write() {
 
     window.addEventListener('mousemove', function (e) {
       if (prevX.current == null || prevY.current == null || !draw.current) {
-        prevX.current = e.clientX;
-        prevY.current = e.clientY;
+        prevX.current = e.clientX - canvas.getBoundingClientRect().left;
+        prevY.current = e.clientY - canvas.getBoundingClientRect().top;
         return;
       }
-
-      console.log(prevX.current);
-      let mouseX = e.clientX;
-      let mouseY = e.clientY;
+      let mouseX = e.clientX - canvas.getBoundingClientRect().left;
+      let mouseY = e.clientY - canvas.getBoundingClientRect().top;
       ctx.current.beginPath();
       ctx.current.moveTo(prevX.current, prevY.current);
-      ctx.current.lineTo(mouseX.current, mouseY.current);
+      ctx.current.lineTo(mouseX, mouseY);
       ctx.current.stroke();
 
-      prevX.current = e.clientX;
-      prevY.current = e.clientY;
+      prevX.current = e.clientX - canvas.getBoundingClientRect().left;
+      prevY.current = e.clientY - canvas.getBoundingClientRect().top;
     });
     return () => {
       window.removeEventListener('mousedown', (e) => (draw.current = true));
@@ -66,20 +65,20 @@ export default function Write() {
 
       window.removeEventListener('mousemove', function (e) {
         if (prevX.current == null || prevY.current == null || !draw.current) {
-          prevX.current = e.clientX;
-          prevY.current = e.clientY;
+          prevX.current = e.clientX - canvas.getBoundingClientRect().left;
+          prevY.current = e.clientY - canvas.getBoundingClientRect().top;
           return;
         }
 
-        let mouseX = e.clientX;
-        let mouseY = e.clientY;
+        let mouseX = e.clientX - canvas.getBoundingClientRect().left;
+        let mouseY = e.clientY - canvas.getBoundingClientRect().top;
         ctx.current.beginPath();
         ctx.current.moveTo(prevX.current, prevY.current);
-        ctx.current.lineTo(mouseX.current, mouseY.current);
+        ctx.current.lineTo(mouseX, mouseY);
         ctx.current.stroke();
 
-        prevX.current = e.clientX;
-        prevY.current = e.clientY;
+        prevX.current = e.clientX - canvas.getBoundingClientRect().left;
+        prevY.current = e.clientY - canvas.getBoundingClientRect().top;
       });
     };
   }, []);
@@ -101,7 +100,13 @@ export default function Write() {
           ))}
         </Select>
       </FormControl>
-      <canvas id="canvas" />
+      <Box
+        sx={{
+          border: '1px solid black',
+        }}
+      >
+        <canvas id="canvas" />
+      </Box>
       <Button>Submit</Button>
     </Stack>
   );
