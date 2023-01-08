@@ -33,6 +33,6 @@ Our team was able to create a fully functional web app within 24hr hours.
 ## What we learned
 We learned about various technologies/ frameworks and  cloud services such as flask, replit, Microsoft cloud. 
 
-## What's next for Untitled
+## What's next for Pennmanship Pro
 Creating a mobile app would be our next move.
 
