@@ -6,6 +6,7 @@ import {
   Select,
   MenuItem,
   Box,
+  Typography,
 } from '@mui/material';
 import React, {useState, useEffect, useRef} from 'react';
 import {socket} from '../App';
@@ -25,10 +26,22 @@ let previous = null;
 
 export default function Write() {
   const [selected, setSelected] = useState('A');
+  const [result, setResult] = useState(null);
 
   const handleChange = (event) => {
     setSelected(event.target.value);
   };
+
+  // Socketio
+  useEffect(() => {
+    socket.on('prediction', (data) => {
+      let temp = letters[data[0]];
+      setResult({
+        result: temp,
+        accuracy: data[1],
+      });
+    });
+  }, []);
 
   let prevX = useRef(null);
   let prevY = useRef(null);
@@ -117,7 +130,7 @@ export default function Write() {
         Clear
       </Button>
 
-      <FormControl fullWidth>
+      <FormControl>
         <InputLabel>Letter</InputLabel>
 
         <Select
@@ -126,9 +139,9 @@ export default function Write() {
           onChange={handleChange}
           MenuProps={MenuProps}
         >
-          {letters.map((letter, index) => (
-            <MenuItem key={index} value={letter}>
-              {letter}
+          {Object.keys(letters).map((letter) => (
+            <MenuItem key={letter} value={letters[letter]}>
+              {letters[letter]}
             </MenuItem>
           ))}
         </Select>
@@ -151,9 +164,6 @@ export default function Write() {
           let pixels = [];
           for (let i = 0; i < nums.length; i += 4) {
             let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3.0;
-            if (avg > 0) {
-              console.log(avg);
-            }
             pixels.push([avg, avg, avg]);
             if (pixels.length === 224) {
               array.push(pixels);
@@ -171,6 +181,21 @@ export default function Write() {
       >
         Submit
       </Button>
+      {result && (
+        <Stack direction="column" alignItems="center" justifyContent="center">
+          <Typography>Result: {result.result}</Typography>
+          <Typography>
+            {selected === result.result
+              ? 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'
+              : 'You have written the wrong letter, you have written a: ' +
+                result.result +
+                '\n' +
+                'Your accuracy is: ' +
+                (result.accuracy * 100).toFixed(2) +
+                '%'}
+          </Typography>
+        </Stack>
+      )}
     </Stack>
   );
 }

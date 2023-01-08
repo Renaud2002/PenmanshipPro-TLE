@@ -45,12 +45,12 @@ def handle_predict(json):
     data = np.asarray(data, dtype=np.uint8)
     # Downscale to 28x28
     data = cv2.resize(data, dsize=(28, 28), interpolation=cv2.INTER_CUBIC)
-    data = cv2.resize(data, dsize=(224, 224), interpolation=cv2.INTER_CUBIC)
-
-    img = Image.fromarray(data, 'RGB')
-    img.save('my.png')
-    img.show()
-    print(writing.infer(data))
+    
+    #img = Image.fromarray(data, 'RGB')
+    #img.save('my.png')
+    #img.show()
+    # Convert from 28,28,3 to 28,28,1
+    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
     socketio.emit('prediction', writing.infer(data))
 
 

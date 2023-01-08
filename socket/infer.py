@@ -20,10 +20,11 @@ class WritingInferrer:
         image = self.preprocess(image)
         # Converts the image to a tensor
         image = tf.convert_to_tensor(image, dtype=tf.float32)
+        
         # Reshapes the image
-        image = tf.reshape(image, [1, 224, 224, 3])
+        image = tf.reshape(image, [1, 28, 28, 1])
         # Gets the prediction
-        prediction = self.predict(image)['dense_11']
+        prediction = self.predict(image)['dense_21']
         # Gets the prediction
         prediction = prediction.numpy()
         # Get highest element in prediction
