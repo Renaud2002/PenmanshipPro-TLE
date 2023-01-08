@@ -56,10 +56,10 @@ export default function Write() {
     ctx.current = canvas.current.getContext('2d');
     ctx.current.lineWidth = 20;
     // Line should be white
-    ctx.current.strokeStyle = 'white';
+    ctx.current.strokeStyle = 'black';
 
     // Make the canvas background white
-    ctx.current.fillStyle = 'black';
+    ctx.current.fillStyle = 'white';
     ctx.current.fillRect(0, 0, canvas.current.width, canvas.current.height);
 
     window.addEventListener('mousedown', (e) => (draw.current = true));
@@ -115,24 +115,12 @@ export default function Write() {
       alignItems="center"
       justifyContent="center"
       spacing={2}
+      sx={{
+        mt: 5,
+      }}
     >
-      <Button
-        onClick={() => {
-          ctx.current.fillStyle = 'black';
-          ctx.current.fillRect(
-            0,
-            0,
-            canvas.current.width,
-            canvas.current.height,
-          );
-        }}
-      >
-        Clear
-      </Button>
-
       <FormControl>
         <InputLabel>Letter</InputLabel>
-
         <Select
           value={selected}
           label="Letter"
@@ -146,6 +134,20 @@ export default function Write() {
           ))}
         </Select>
       </FormControl>
+      <Button
+        onClick={() => {
+          ctx.current.fillStyle = 'white';
+          ctx.current.fillRect(
+            0,
+            0,
+            canvas.current.width,
+            canvas.current.height,
+          );
+        }}
+      >
+        Clear
+      </Button>
+
       <Box
         sx={{
           border: '1px solid black',
@@ -153,6 +155,7 @@ export default function Write() {
       >
         <canvas id="canvas" />
       </Box>
+
       <Button
         onClick={() => {
           const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
@@ -183,16 +186,16 @@ export default function Write() {
       </Button>
       {result && (
         <Stack direction="column" alignItems="center" justifyContent="center">
-          <Typography>Result: {result.result}</Typography>
+          <Typography>
+            {selected === result.result
+              ? 'You have written the correct letter: ' + result.result
+              : 'You have written the wrong letter, you have written a: ' +
+                result.result}
+          </Typography>
           <Typography>
             {selected === result.result
               ? 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'
-              : 'You have written the wrong letter, you have written a: ' +
-                result.result +
-                '\n' +
-                'Your accuracy is: ' +
-                (result.accuracy * 100).toFixed(2) +
-                '%'}
+              : 'Your accuracy is: ' + (result.accuracy * 100).toFixed(2) + '%'}
           </Typography>
         </Stack>
       )}

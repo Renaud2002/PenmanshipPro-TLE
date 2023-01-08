@@ -42,7 +42,8 @@ def handle_json(json):
 @socketio.on('predict')
 def handle_predict(json):
     data = js.loads(json)
-    data = np.asarray(data, dtype=np.uint8)
+    #Flip the image so 255 is white and 0 is black
+    data = 255 - np.asarray(data, dtype=np.uint8)
     # Downscale to 28x28
     data = cv2.resize(data, dsize=(28, 28), interpolation=cv2.INTER_CUBIC)
     
