@@ -2,6 +2,10 @@
 
 Live Demo: https://penmanship.hop.sh/
 
+Video: https://www.youtube.com/watch?v=tf44b12LaDU
+
+Website: https://kazitasin07.wixsite.com/penmenshipro
+
 
 <img width="248" alt="image" src="https://user-images.githubusercontent.com/96634575/211190685-c79dfca5-43d1-4d24-aa2c-6968a5baabf0.png">
 
