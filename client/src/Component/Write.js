@@ -43,6 +43,10 @@ export default function Write() {
     ctx.current = canvas.current.getContext('2d');
     ctx.current.lineWidth = 5;
 
+    // Make the canvas background white
+    ctx.current.fillStyle = 'white';
+    ctx.current.fillRect(0, 0, canvas.current.width, canvas.current.height);
+
     window.addEventListener('mousedown', (e) => (draw.current = true));
     window.addEventListener('mouseup', (e) => (draw.current = false));
 
@@ -138,11 +142,15 @@ export default function Write() {
           const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
             colorSpace: 'srgb',
           });
+
           const nums = ctx_data.data;
           let array = [];
           let pixels = [];
           for (let i = 0; i < nums.length; i += 4) {
-            let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3;
+            let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3.0;
+            if (avg < 255) {
+              console.log(avg);
+            }
             pixels.push([avg, avg, avg]);
             if (pixels.length === 224) {
               array.push(pixels);
@@ -152,9 +160,10 @@ export default function Write() {
           if (previous === null) {
             previous = array.toString();
           } else {
-            console.log(previous.toString() === array.toString());
+            console.log(previous === array.toString());
             previous = array.toString();
           }
+
           socket.emit('predict', array);
         }}
       >
