@@ -1,24 +1,22 @@
 import logo from './logo.svg';
+import React, {useState} from 'react';
 import './App.css';
+import {Box, Typography} from '@mui/material';
+import Write from './Component/Write';
 
 function App() {
+  const [mode, setMode] = useState(0);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box
+      width="100vw"
+      height="100vh"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+    >
+      {mode === 0 && <Write />}
+    </Box>
   );
 }
 
