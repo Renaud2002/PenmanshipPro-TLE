@@ -21,6 +21,7 @@ const MenuProps = {
     },
   },
 };
+let previous = null;
 
 export default function Write() {
   const [selected, setSelected] = useState('A');
@@ -53,6 +54,7 @@ export default function Write() {
       }
       let mouseX = e.clientX - canvas.current.getBoundingClientRect().left;
       let mouseY = e.clientY - canvas.current.getBoundingClientRect().top;
+      if (mouseX < 0 || mouseY < 0 || mouseX > 224 || mouseY > 224) return;
       ctx.current.beginPath();
       ctx.current.moveTo(prevX.current, prevY.current);
       ctx.current.lineTo(mouseX, mouseY);
@@ -76,6 +78,7 @@ export default function Write() {
 
         let mouseX = e.clientX - canvas.current.getBoundingClientRect().left;
         let mouseY = e.clientY - canvas.current.getBoundingClientRect().top;
+
         ctx.current.beginPath();
         ctx.current.moveTo(prevX.current, prevY.current);
         ctx.current.lineTo(mouseX, mouseY);
@@ -94,41 +97,19 @@ export default function Write() {
       justifyContent="center"
       spacing={2}
     >
-      <Stack direction="row" alignItems="center" justifyContent="center">
-        <Button
-          onClick={() => {
-            const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
-              colorSpace: 'srgb',
-            });
-            const nums = ctx_data.data;
-            let array = [];
-            let pixels = [];
-            for (let i = 0; i < nums.length; i += 4) {
-              let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3;
-              pixels.push([avg, avg, avg]);
-              if (pixels.length === 224) {
-                array.push(pixels);
-                pixels = [];
-              }
-            }
-            socket.emit('predict', array);
-          }}
-        >
-          Save
-        </Button>
-        <Button
-          onClick={() => {
-            ctx.current.clearRect(
-              0,
-              0,
-              canvas.current.width,
-              canvas.current.height,
-            );
-          }}
-        >
-          Clear
-        </Button>
-      </Stack>
+      <Button
+        onClick={() => {
+          ctx.current.clearRect(
+            0,
+            0,
+            canvas.current.width,
+            canvas.current.height,
+          );
+        }}
+      >
+        Clear
+      </Button>
+
       <FormControl fullWidth>
         <InputLabel>Letter</InputLabel>
 
@@ -152,7 +133,33 @@ export default function Write() {
       >
         <canvas id="canvas" />
       </Box>
-      <Button>Submit</Button>
+      <Button
+        onClick={() => {
+          const ctx_data = ctx.current.getImageData(0, 0, 224, 224, {
+            colorSpace: 'srgb',
+          });
+          const nums = ctx_data.data;
+          let array = [];
+          let pixels = [];
+          for (let i = 0; i < nums.length; i += 4) {
+            let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3;
+            pixels.push([avg, avg, avg]);
+            if (pixels.length === 224) {
+              array.push(pixels);
+              pixels = [];
+            }
+          }
+          if (previous === null) {
+            previous = array.toString();
+          } else {
+            console.log(previous.toString() === array.toString());
+            previous = array.toString();
+          }
+          socket.emit('predict', array);
+        }}
+      >
+        Submit
+      </Button>
     </Stack>
   );
 }
