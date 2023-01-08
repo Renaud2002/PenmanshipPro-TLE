@@ -41,10 +41,12 @@ export default function Write() {
     canvas.current.height = 224;
     canvas.current.width = 224;
     ctx.current = canvas.current.getContext('2d');
-    ctx.current.lineWidth = 5;
+    ctx.current.lineWidth = 20;
+    // Line should be white
+    ctx.current.strokeStyle = 'white';
 
     // Make the canvas background white
-    ctx.current.fillStyle = 'white';
+    ctx.current.fillStyle = 'black';
     ctx.current.fillRect(0, 0, canvas.current.width, canvas.current.height);
 
     window.addEventListener('mousedown', (e) => (draw.current = true));
@@ -103,7 +105,8 @@ export default function Write() {
     >
       <Button
         onClick={() => {
-          ctx.current.clearRect(
+          ctx.current.fillStyle = 'black';
+          ctx.current.fillRect(
             0,
             0,
             canvas.current.width,
@@ -148,7 +151,7 @@ export default function Write() {
           let pixels = [];
           for (let i = 0; i < nums.length; i += 4) {
             let avg = (nums[i] + nums[i + 1] + nums[i + 2]) / 3.0;
-            if (avg < 255) {
+            if (avg > 0) {
               console.log(avg);
             }
             pixels.push([avg, avg, avg]);
@@ -163,8 +166,7 @@ export default function Write() {
             console.log(previous === array.toString());
             previous = array.toString();
           }
-
-          socket.emit('predict', array);
+          socket.emit('predict', JSON.stringify(array));
         }}
       >
         Submit
