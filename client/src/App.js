@@ -1,14 +1,12 @@
-import logo from './logo.svg';
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
-import {Box, Typography} from '@mui/material';
+import {Box} from '@mui/material';
 import Write from './Component/Write';
 import {io} from 'socket.io-client';
 
-export const socket = io('http://127.0.0.1:5000');
+export const socket = io('https://penmanshipbackend.hop.sh/');
 
 function App() {
-  const [mode, setMode] = useState(0);
   return (
     <Box
       width="100%"
@@ -18,7 +16,7 @@ function App() {
       justifyContent="center"
       alignItems="center"
     >
-      {mode === 0 && <Write />}
+      <Write />
     </Box>
   );
 }
