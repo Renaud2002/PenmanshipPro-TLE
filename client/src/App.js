@@ -8,8 +8,8 @@ function App() {
   const [mode, setMode] = useState(0);
   return (
     <Box
-      width="100vw"
-      height="100vh"
+      width="100%"
+      height="100%"
       display="flex"
       flexDirection="column"
       justifyContent="center"
