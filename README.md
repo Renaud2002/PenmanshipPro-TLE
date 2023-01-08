@@ -1,4 +1,4 @@
-# TLE_hackathon - Pennmanship
+# Pennmanship - TLE
 
 Live Demo: https://penmanship.hop.sh/
 
