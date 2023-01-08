@@ -1,7 +1,9 @@
 import tensorflow as tf
 
+
 class WritingInferrer:
-    def _init_(self):
+
+    def __init__(self):
         self.saved_path = 'model'
         self.model = tf.saved_model.load(self.saved_path)
 
@@ -18,17 +20,15 @@ class WritingInferrer:
         image = self.preprocess(image)
         # Converts the image to a tensor
         image = tf.convert_to_tensor(image, dtype=tf.float32)
-        # Convert the image to RGB
-        image = tf.image.grayscale_to_rgb(image)
+        
         # Reshapes the image
-        image = tf.reshape(image, [1, 244, 244, 3])
+        image = tf.reshape(image, [1, 28, 28, 1])
         # Gets the prediction
-        prediction = self.predict(image)
-        # Gets the prediction
-        prediction = prediction['dense_1']
+        prediction = self.predict(image)['dense_21']
         # Gets the prediction
         prediction = prediction.numpy()
+        # Get highest element in prediction
+        percentage = prediction.max()
         # Gets the prediction
         prediction = prediction.argmax()
-        return prediction
-
+        return [int(prediction), float(percentage)]

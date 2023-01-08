@@ -2,7 +2,7 @@ let canvas = document.getElementById('canvas');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 let ctx = canvas.getContext('2d');
-ctx.lineWidth = 5;
+ctx.lineWidth = 20;
 var socket = io('http://localhost:5000/');
 
 function getImg() {
